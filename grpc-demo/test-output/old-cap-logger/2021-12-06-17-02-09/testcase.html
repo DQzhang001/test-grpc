@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class='no-js' ng-app ng-controller="DataCtrl" lang='en'>
+  <head>
+    <script src="./js/jquery.min.js" type="text/javascript"></script>
+    <script src="./js/angular.min.js"></script>
+    <meta charset='utf-8'>
+    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <title> Dashboard</title>
+    <meta content='lab2023' name='author'>
+    <meta content='' name='description'>
+    <meta content='' name='keywords'>
+  <!--   <link rel="stylesheet" href="./css/bootstrap.css"> -->
+    <link href="./css/application-a07755f5.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="./font-awesome/css/font-awesome.min.css">
+    <link href="./images/favicon.ico" rel="icon" type="image/ico" />
+    <style type="text/css">
+    .padding-none{
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+    .form-group{
+      margin-bottom: 0px;
+    }
+    .label-success{
+      background-color: #5cb85c;
+      color: #fff
+    }
+    .label-danger{
+      background-color: #d9534f;
+      color: #fff
+    }
+    </style>
+  </head>
+  <body class='main page'>
+    <!-- Navbar -->
+    <div class='navbar navbar-default' id='navbar'>
+      <a class='navbar-brand' href='./dashboard.html'>
+        <i class='icon-beer'></i>
+        Cap Test Report
+      </a>
+    </div>
+    <div id='wrapper'>
+      <!-- Sidebar -->
+      <section id='sidebar'>
+        <i class='icon-align-justify icon-large' id='toggle'></i>
+        <ul id='dock'>
+          <li class='active launcher'>
+            <i class='icon-dashboard'></i>
+            <a href="dashboard.html">Dashboard</a>
+          </li>
+        </ul>
+        <div data-toggle='tooltip' id='beaker' title='Made by lab2023'></div>
+      </section>
+      <!-- Tools -->
+      <section id='tools'>
+        <ul class='breadcrumb' id='breadcrumb'>
+          <li class='title'>Dashboard</li>
+          <li ><a href="./dashboard.html">Index</a></li>
+          <li class='active'>TestCase</li>
+        </ul>
+      </section>
+      <!-- Content -->
+      <div id='content' ng-controller="testSuitCtrl">
+        <div class="row">
+          <div class='panel panel-default   col-md-12 padding-none'>
+              <div class='panel-heading'>
+                <i class='icon-info-sign icon-large'></i>
+                <strong>{{testSuit.suitname}}</strong> Report
+              </div>
+              <div class='panel-body'>
+                <legend>概况</legend>
+                <div id="message" class="col-md-6">
+                  <form>
+                    <fieldset>
+                      <div class='form-group'>
+                        <label class='control-label'>开始时间：</label>
+                        {{testSuit.starttime}}
+                      </div>
+                      <div class='form-group'>
+                        <label class='control-label'>结束时间：</label>
+                        {{testSuit.endtime}}
+                      </div>
+                      <div class='form-group'>
+                        <label class='control-label'>运行时间(s)：</label>
+                        {{testSuit.totaltime}}
+                      </div>
+                      <div class='form-group'>
+                        <label class='control-label'>总用例数：</label>
+                        {{testSuit.total}}
+                      </div>
+                      <div class='form-group'>
+                        <label class='control-label'>通过用例数：</label>
+                        {{testSuit.success}}
+                      </div> 
+                      <div class='form-group'>
+                        <label class='control-label'>失败用例数：</label>
+                        {{testSuit.fail}}
+                      </div>
+                      <div class='form-group'>
+                        <label class='control-label'>未执行用例数：</label>
+                        {{testSuit.skip}}
+                      </div>                 
+                    </fieldset>      
+                  </form> 
+                </div>
+                <div class="col-md-6" ng-controller="ChartCtrl" >
+                  <canvas id="chart-area" width="350" height="350" style="width: 350px; height: 350px;"></canvas>
+                </div>
+              
+              </div>
+          </div>
+          <div class='panel panel-default   col-md-12 padding-none'>
+              <div class='panel-heading'>
+                <i class='icon-info-sign icon-large'></i>
+                各Class测试结果
+                <div class="panel-tools">
+                  <div class="btn-group">
+                    <a class="btn" href="dashboard.html">
+                      <i class="icon-step-backward"></i>
+                      返回
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class='panel-body'>
+                <legend>结果明细</legend>
+                <label>脚本搜索:</label> <input ng-model="query">
+                <div ng-repeat="singleclass in testSuit.testclass | filter:query">
+                  <legend>{{singleclass.classname}}</legend>
+                  <table class='table table-bordered' >
+                    <thead>
+                      <tr>
+                      	<th style="width:30%; text-align: left;">用例名称</th>
+                        <th style="width:20%; text-align: left;">脚本名称</th>
+                        <th style="width:15%; text-align: left;">开始时间</th>
+                        <th style="width:15%; text-align: left;">结束时间</th>
+                        <th style="width:7%; text-align: left;">运行时间(s)</th>
+                        <th style="width:7%; text-align: left;">测试结果</th>
+                        <th style="width:6%; text-align: left;">日志</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                       <tr ng-repeat="singlecase in singleclass.cases">
+                       	  <td style="width:30%; text-align: left;">{{singlecase.TestRailName}}</td>
+                          <td style="width:20%; text-align: left;">{{singlecase.casename}}</td>
+                          <td style="width:15%; text-align: left;">{{singlecase.starttime}}</td>
+                          <td style="width:15%; text-align: left;">{{singlecase.endtime}}</td>
+                          <td style="width:7%; text-align: left;">{{singlecase.totaltime}}</td>
+                          <td style="width:7%; text-align: left;">
+                          <div  ng-switch on="singlecase.result" >
+                            <div  ng-switch-when="1" class="label label-success">
+                              <i class="icon-star">Pass</i>
+                            </div>
+                            <div  ng-switch-when="2" class="label label-danger">
+                              <i class="icon-bug">Fail</i>
+                            </div>
+                            <div  ng-switch-default class="label label-default">
+                              <i class="icon-ban-circle">Skip</i>
+                            </div>
+                          </div>
+
+                          </td style="width:6%; text-align: left;">
+                          <td ><a href='logs.html?suitid={{suitid}}&testclassid={{singleclass.id}}&testcaseid={{singlecase.id}}'><i class='icon-eye-open'> {{singlecase.log.length}} logs</a></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+          </div>          
+        </div>
+      </div>
+    </div>
+
+   
+    <script src="./js/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="./js/modernizr.min.js" type="text/javascript"></script>
+    <script src="./js/md5.min.js" type="text/javascript"></script>
+    <script src="./js/chartnew.js"></script>
+        
+    <script src="./js/application-985b892b.js" type="text/javascript"></script>
+    <script src="./js/data.js" type="text/javascript"></script>
+    <script src="./js/init.js" type="text/javascript"></script>
+
+
+     <script type="text/javascript">
+        function testSuitCtrl ($scope) {
+          var id=getUrlParam('id');
+          if(id!=null)
+          {
+            $scope.suitid=id;
+          }
+          var suits=$scope.testSuits.suits;
+          for (var i = 0; i < suits.length; i++) {
+            if(suits[i].id==$scope.suitid)
+            {
+              $scope.testSuit=suits[i];
+              return;
+            }
+          };
+        }
+
+        function ChartCtrl($scope)
+        {
+          var pieData = [
+              {
+                value: $scope.testSuit.fail,
+                color:"#d9534f",
+                title: "Fail",
+              },
+              {
+                value: $scope.testSuit.success,
+                color: "#5cb85c",
+                title: "Pass",
+              },
+              {
+                value: $scope.testSuit.skip,
+                color: "#808080",
+                title: "Skip",
+              }
+            ];
+            var elem=document.getElementById("message");
+            var width=elem.offsetWidth;  
+            var height=elem.offsetHeight; 
+            var size= width<height?width:height;
+            var canvas=document.getElementById("chart-area");
+            canvas.width=size;  
+            canvas.height=size; 
+
+            var opt1 = {
+            legend : true,
+            legendBorders:false,
+            inGraphDataShow : false,
+            annotateDisplay : true,
+            graphTitleFontSize: 0,
+            spaceTop : 0,
+            spaceRight : 0,
+            }
+ 
+            var ctx = document.getElementById("chart-area").getContext("2d");
+            var myPie = new Chart(ctx);
+            myPie.Pie(pieData,opt1,myPie);
+        }
+     </script>
+  </body>
+</html>

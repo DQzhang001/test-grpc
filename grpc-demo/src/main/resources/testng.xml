@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite configfailurepolicy="continue" thread-count="1" parallel="methods" name="test-grpc">
+    <parameter name="env" value="test"/>
+    <test name="test-demo" verbose="2">
+        <classes>
+            <class name="com.convertlab.testdemos.demoClient"/>
+        </classes>
+    </test>
+    <listeners>
+        <listener class-name="com.convertlab.testNG.GRPCReporter"></listener>
+    </listeners>
+</suite>
